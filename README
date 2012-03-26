@@ -1,6 +1,6 @@
 mandelbrot fractal & postscript exercise.
 
-Usage: java mandel.java < input.txt > image.ps
+Usage: java mandelColor.java < input.txt > image.ps
 
 	pipe standard input output to filename.ps
 	generates image.ps using the input from input.txt
