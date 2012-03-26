@@ -2,14 +2,13 @@ import java.util.*;
 
 public class mandelColor{
 	public static void main(String args[]){
-		//temp vals: to be read in later
-		//assume square for now
-		double xmin, ymin, xmax, ymax;
-		int n = 256;
-		xmin = -1.5;
-		ymin = -1.0;
-		xmax = 0.5;
-		ymax = 1.0;
+		
+		Scanner sc = new Scanner(System.in);
+		int n = Integer.parseInt(sc.nextLine());
+		double xmin = Double.parseDouble(sc.nextLine());
+		double ymin = Double.parseDouble(sc.nextLine());
+		double xmax = Double.parseDouble(sc.nextLine());
+		double ymax = Double.parseDouble(sc.nextLine());
 		
 		double width = xmax - xmin;
 		double height = ymax - ymin;
@@ -26,8 +25,9 @@ public class mandelColor{
 		double xPlot, yPlot;
 		
 		//color section (question part 3)
-		Scanner sc = new Scanner(System.in);
+
 		String line = new String();
+		
 		double[][] colorMap = new double[256][3];
 		int count = 0;
 		while (sc.hasNext()){
@@ -51,8 +51,8 @@ public class mandelColor{
 		//plot points
 		for(double i=xmin; i<=xmax; i+= width/n){ //divide x (width) into n increments
 			for(double j=ymin; j<=ymax; j+=height/n){ //divide y(height) int n
-				//prints the x,y
-				//System.out.println(i + ", " + j);
+				
+				
 				int test = mandel(i, j);
 								
 				xPlot = ((i + xTrans) * xScale) - ((512/n)/2);
@@ -60,7 +60,7 @@ public class mandelColor{
 				
 				double color = 1 - (test/255); 
 				
-				System.out.println(color + " setrgbcolor " + xPlot + " " + yPlot + " " + (512/n) + " " + (512/n) + " rectfill");
+				System.out.println(colorMap[test][0] +" "+ colorMap[test][1] +" "+ colorMap[test][2] + " setrgbcolor " + xPlot + " " + yPlot + " " + (512/n) + " " + (512/n) + " rectfill");
 				
 			}
 		}
