@@ -1,0 +1,29 @@
+.blurbs{
+	width:760px;
+	margin: 15px;
+	color: #444;
+}
+.container{
+	float:left;
+	width:800px;
+}
+
+
+#canvas1{
+	margin-left:15px;
+	float:left;
+
+}
+
+.inputpanel{
+	margin:10px;
+	float:left;
+	width:250px;
+}
+
+.description{
+	float:left;
+	width:250px;
+	color: #bbb;
+
+}

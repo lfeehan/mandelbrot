@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mandelbrot HTML 5</title>
+<meta charset="UTF-8" />
+<link rel="stylesheet" type="text/css" href="style.css" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js "></script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+			calcmand();
+		});
+
+//------------------------------------------------------------------------------
+
+
+function calcmand(){
+	xmlDoc=loadXMLDoc("http://www.lenfeehan.com/projects/mand/colorset.xml");
+	var colorMap = fillArray(xmlDoc);
+	
+	var res = document.getElementById("resolution").value;
+	
+	
+	var m = new mand(res);
+
+	var c = document.getElementById("canvas1");
+	var context = c.getContext("2d");
+	
+	for(i=m.xmin; i<=m.xmax; i+= m.width/m.n){ //divide x (width) into n increments
+		for(j=m.ymin; j<=m.ymax; j+=m.height/m.n){ //divide y(height) int n
+			
+			var test = mandel(i, j);
+			
+			xPlot = Math.floor(((i + m.xTrans) * m.xScale) - ((512/m.n)/2));
+			yPlot = Math.floor(((j + m.yTrans) * m.yScale) - ((512/m.n)/2));
+		
+			context.fillStyle = "rgb(" + colorMap[test][0] +","+ colorMap[test][1] +","+ colorMap[test][2] +")";
+			context.fillRect(xPlot, yPlot, (512/m.n),(512/m.n));
+		
+		}
+	}
+}
+
+function loadXMLDoc(dname){
+	if (window.XMLHttpRequest){
+		xhttp=new XMLHttpRequest();
+	}else{
+		xhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	
+	xhttp.open("GET",dname,false);
+	xhttp.send();
+	return xhttp.responseXML;
+}
+
+function mand(res){
+	
+	this.n = res;
+	
+	
+	for (var i=0; i < document.locationform.loc.length; i++){
+		if (document.locationform.loc[i].checked)
+		{
+			var location = document.locationform.loc[i].value;
+		}
+	}
+	
+	switch (location){
+		case "1":{
+			this.xmin = -2.0;
+			this.ymin = -1.5;
+			this.xmax = 1.0;
+			this.ymax = 1.5;
+		}
+		break;
+		case "2":{	
+			this.xmin = 0.0016;
+			this.ymin = -0.8224;
+			this.xmax = 0.0032;
+			this.ymax = -0.8208;	
+		}
+		break;
+		case "3":{
+			this.xmin = 0.2695;
+			this.ymin = 0.0045;
+			this.xmax = 0.2715;
+			this.ymax = 0.0065;
+		}
+		break;
+	}
+	
+	this.width = this.xmax - this.xmin;
+	this.height = this.ymax - this.ymin;
+		
+	this.increment = this.width/this.n;
+	
+	this.topRight = 512-((512/this.n)/2);
+	
+	this.xTrans = 0 - this.xmin;
+	this.yTrans = 0 - this.ymin;
+	this.xScale = this.topRight / (this.xmax + this.xTrans);
+	this.yScale = this.topRight / (this.ymax + this.yTrans);
+
+}
+
+function fillArray(xmlDoc){
+	
+	var count = 0;
+	var some = xmlDoc.getElementsByTagName("col");	
+	var myArray = new Array(some.length);
+	
+	for(i=0; i<some.length; i++){
+		myArray[i] = new Array(3);
+		
+		myArray[i][0] = Math.floor(some[i].getElementsByTagName("red")[0].childNodes[0].nodeValue * 255);
+		myArray[i][1] = Math.floor(some[i].getElementsByTagName("green")[0].childNodes[0].nodeValue * 255);
+		myArray[i][2] = Math.floor(some[i].getElementsByTagName("blue")[0].childNodes[0].nodeValue * 255);
+	}
+	return myArray;	
+}
+
+
+function mandel(x, y){
+	var count = 0;
+	var r=x;
+	var s=y;
+	
+	var exitCondition = 0;
+	
+	//exceeds 255 = extremely likely in the set
+	//r*r + s*s > 4 = not in the set at all.
+	
+	while ( count < 255 && !(exitCondition>4) ){
+	var rTemp = r*r - s*s + x;
+	var sTemp = (2*r*s) + y;
+	
+	r = rTemp;
+	s = sTemp;
+	exitCondition = (r*r) + (s*s);
+	count++;
+	}
+	
+	return count;
+}
+
+</script>
+</head>
+
+<body>
+
+	<h2>
+		Mandelbrot Set with HTML 5 Canvas
+	</h2>
+	
+	<div class="blurbs">
+		<p>
+			This is not just a pretty picture loaded from a file.
+			It is a calculated <a href="http://en.wikipedia.org/wiki/Mandelbrot_set">mandelbrot set.</a>
+			The calculation is done on the client side with javascript and the output is rendered using the <strong>HTML5 CANVAS</strong> tag.
+			The color palette is read from a <strong>server side XML</strong> file. Try some values... (starts looking nice around 512)
+		</p>
+	</div>
+	<div class="container">
+		<canvas id="canvas1" height="512" width="512">
+			Your browser doesn't support html 5 canvas.<br/>
+			All the other kids are laughing at you....
+		</canvas>
+		
+		<div class="inputpanel">
+			<input type="number" id="resolution" value="32" onclick/>
+			<input type="submit" value="refresh" onclick="calcmand()"/>
+			<div class="description">
+				Enter a resolution. (works best with multiples of 8, values greater than 512 may be slow as more calculations are required)
+			</div>
+			<br/>
+		</div>
+		<div class="inputpanel">	
+			<div class="description">
+			Try some different co-ordinates within the set...
+			</div>
+			<form name="locationform" action="javascript:calcmand()">
+				<ul>
+					<li><input type="radio" value="1" name="loc" checked="checked"> 0, 0 (The full set) </radio></li> 
+					<li><input type="radio" value="2" name="loc"> 0.0016, -0.8224 </radio></li>
+					<li><input type="radio" value="3" name="loc"> 0.2695, 0.0045 </radio></li> 
+				</ul>
+				<input type="submit" value="go.."/>
+			</form>
+		</div>
+	</div>
+
+</body>
+
+</html>
